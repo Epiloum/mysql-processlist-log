@@ -87,7 +87,7 @@ try {
             }
         }
 
-        throw new Exception("Unknown option '" . $argv[$i]);
+        throw new Exception("Unknown option '" . $argv[$i] . "'");
     }
 
     // Validate interval
