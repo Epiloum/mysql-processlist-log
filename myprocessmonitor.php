@@ -20,8 +20,59 @@ if (!isset($argv[1])) {
 
 // Error Handling
 try {
+    // Check exists PDO class
     if (!class_exists('PDO')) {
         throw new Exception("Can't find the PDO class");
+    }
+
+    // Init
+    $target = null;
+    $host = '';
+    $user = '';
+    $password = '';
+    $untilStopped = false;
+
+    // Parse arguments
+    $len = count($argv);
+
+    for ($i = 1; $i < $len; $i++) {
+        if (!is_null($target)) {
+            ${$target} = $argv[$i];
+            $target = null;
+            continue;
+        }
+
+        switch ($argv[$i]) {
+            case '-h':
+                $target = 'host';
+                continue 2;
+
+            case '-u':
+                $target = 'user';
+                continue 2;
+
+            case '-p':
+                $target = 'password';
+                continue 2;
+
+            case '-t':
+            case '--until-stopped':
+                $untilStopped = true;
+                continue 2;
+        }
+
+        if (preg_match('/^--(host|user|password)=(.+)$/', $argv[$i], $matches)) {
+            switch($matches[1])
+            {
+                case 'host':
+                case 'user':
+                case 'password':
+                    ${$matches[1]} = $matches[2];
+                    continue 2;
+            }
+        }
+
+        throw new Exception("unknown option '" . $argv[$i]);
     }
 } catch (Exception $e) {
     exit($argv[0] . ": " . $e->getMessage() . "\n");
