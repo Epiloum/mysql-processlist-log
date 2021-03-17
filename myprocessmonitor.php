@@ -12,6 +12,7 @@ Options:
   -u, --user=user       Mysql User for login.
   -p, --password=text   Password to use when connecting to server.
   -t, --until-stopped   Keeps the monitoring until stopped by the user.
+  -i, --interval=sec    Monitoring interval in milliseconds. (500-60000)
 ";
 
 // Print help
@@ -26,13 +27,14 @@ try {
         throw new Exception("Can't find the PDO class");
     }
 
-    // Init
+    // Init variables
     $target = null;
     $host = '';
     $port = 3306;
     $user = '';
     $password = '';
     $untilStopped = false;
+    $interval = 1000;
 
     // Parse arguments
     $len = count($argv);
@@ -65,21 +67,41 @@ try {
             case '--until-stopped':
                 $untilStopped = true;
                 continue 2;
+
+            case '-i':
+                $target = 'interval';
+                continue 2;
         }
 
-        if (preg_match('/^--(host|port|user|password)=(.+)$/', $argv[$i], $matches)) {
+        $pattern = '/^--(host|port|user|password|interval)=(.+)$/';
+
+        if (preg_match($pattern, $argv[$i], $matches)) {
             switch ($matches[1]) {
                 case 'host':
                 case 'port':
                 case 'user':
                 case 'password':
+                case 'interval':
                     ${$matches[1]} = $matches[2];
                     continue 2;
             }
         }
 
-        throw new Exception("unknown option '" . $argv[$i]);
+        throw new Exception("Unknown option '" . $argv[$i]);
     }
+
+    // Validate interval
+    if ($untilStopped) {
+        if(!is_numeric($interval)) {
+            throw new Exception("Invalid interval");
+        } elseif ($interval < 500) {
+            throw new Exception("Too short interval");
+        } elseif ($interval > 60000) {
+            throw new Exception("Too long interval");
+        }
+    }
+
+    $interval = $untilStopped? intval($interval, 10): 0;
 
     // Connect MySQL by PDO
     $dsn = "mysql:host=" . $host . ";port=" . $port . ";charset=utf8;";
@@ -93,7 +115,7 @@ try {
             echo "[" . date('Y-m-d H:i:s') . "] " . implode("\t", $v), "\n";
         }
 
-        sleep(2);
+        usleep($interval * 1000);
     } while ($untilStopped);
 } catch (Exception $e) {
     exit($argv[0] . ": " . $e->getMessage() . "\n");
