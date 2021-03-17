@@ -17,3 +17,12 @@ Options:
 if (!isset($argv[1])) {
     exit($help);
 }
+
+// Error Handling
+try {
+    if (!class_exists('PDO')) {
+        throw new Exception("Can't find the PDO class");
+    }
+} catch (Exception $e) {
+    exit($argv[0] . ": " . $e->getMessage() . "\n");
+}
