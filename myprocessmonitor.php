@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 // Help Text
-$help = "MySQL Process List Monitor
+$help = "MySQL Query List Monitor
 
 Usage:
   command [options]
@@ -68,8 +68,7 @@ try {
         }
 
         if (preg_match('/^--(host|port|user|password)=(.+)$/', $argv[$i], $matches)) {
-            switch($matches[1])
-            {
+            switch ($matches[1]) {
                 case 'host':
                 case 'port':
                 case 'user':
@@ -81,6 +80,21 @@ try {
 
         throw new Exception("unknown option '" . $argv[$i]);
     }
+
+    // Connect MySQL by PDO
+    $dsn = "mysql:host=" . $host . ";port=" . $port . ";charset=utf8;";
+    $db = new PDO($dsn, $user, $password);
+
+    // Execute
+    do {
+        $res = $db->query("SHOW FULL PROCESSLIST", PDO::FETCH_ASSOC);
+
+        while ($v = $res->fetch()) {
+            echo "[" . date('Y-m-d H:i:s') . "] " . implode("\t", $v), "\n";
+        }
+
+        sleep(2);
+    } while ($untilStopped);
 } catch (Exception $e) {
     exit($argv[0] . ": " . $e->getMessage() . "\n");
 }
