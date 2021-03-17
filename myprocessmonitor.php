@@ -8,6 +8,7 @@ Usage:
 
 Options:
   -h, --host=name       Connect to mysql host.
+  -P, --port=#          Port number for connection or 3306 for default.
   -u, --user=user       Mysql User for login.
   -p, --password=text   Password to use when connecting to server.
   -t, --until-stopped   Keeps the monitoring until stopped by the user.
@@ -28,6 +29,7 @@ try {
     // Init
     $target = null;
     $host = '';
+    $port = 3306;
     $user = '';
     $password = '';
     $untilStopped = false;
@@ -47,6 +49,10 @@ try {
                 $target = 'host';
                 continue 2;
 
+            case '-P':
+                $target = 'port';
+                continue 2;
+
             case '-u':
                 $target = 'user';
                 continue 2;
@@ -61,10 +67,11 @@ try {
                 continue 2;
         }
 
-        if (preg_match('/^--(host|user|password)=(.+)$/', $argv[$i], $matches)) {
+        if (preg_match('/^--(host|port|user|password)=(.+)$/', $argv[$i], $matches)) {
             switch($matches[1])
             {
                 case 'host':
+                case 'port':
                 case 'user':
                 case 'password':
                     ${$matches[1]} = $matches[2];
