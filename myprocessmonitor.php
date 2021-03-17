@@ -27,9 +27,9 @@ try {
         throw new Exception("Can't find the PDO class");
     }
 
-    // Init variables
+    // Initialize or set default values
     $target = null;
-    $host = '';
+    $host = 'localhost';
     $port = 3306;
     $user = '';
     $password = '';
