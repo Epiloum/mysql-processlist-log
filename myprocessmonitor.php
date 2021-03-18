@@ -14,7 +14,7 @@ Options:
   -t, --until-stopped   Keeps the monitoring until stopped by the user.
                         To stop type Control-C
   -i, --interval=#      Monitoring interval in milliseconds. (500-60000)
-  -f, --format=name     Output format(tsv, csv), default is csv. 
+  -f, --format=name     Output format(tsv, csv), default is tsv. 
 ";
 
 // Print help
