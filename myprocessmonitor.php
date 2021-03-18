@@ -37,7 +37,7 @@ try {
     $password = '';
     $untilStopped = false;
     $interval = 1000;
-    $format = 'csv';
+    $format = 'tsv';
 
     // Parse arguments
     $len = count($argv);
@@ -133,9 +133,29 @@ try {
         }
 
         while ($v = $res->fetch()) {
-            echo "[" . date('Y-m-d H:i:s') . "] " . implode($sep, $v), "\n";
-        }
+            unset($v['Id']);
 
+            array_unshift($v, date('Y-m-d H:i:s'));
+
+            $v = array_map(
+                function ($a) use ($format) {
+                    if ($format == 'csv') {
+                        if (strpos($a, ",") !== false) {
+                            return '"' . addslashes($a) . '"';
+                        } else {
+                            return $a;
+                        }
+                    } elseif ($format == 'tsv') {
+                        return str_replace("\t", " ", $a);
+                    } else {
+                        throw new Exception('Wrong output format');
+                    }
+                },
+                $v
+            );
+
+            echo implode($sep, $v), "\n";
+        }
 
         usleep($interval * 1000);
     } while ($untilStopped);
