@@ -9,10 +9,12 @@ Usage:
 Options:
   -h, --host=name       Connect to mysql host.
   -P, --port=#          Port number for connection or 3306 for default.
-  -u, --user=user       Mysql User for login.
-  -p, --password=text   Password to use when connecting to server.
+  -u, --user=name       Mysql user for login.
+  -p, --password=name   Password to use when connecting to server.
   -t, --until-stopped   Keeps the monitoring until stopped by the user.
-  -i, --interval=sec    Monitoring interval in milliseconds. (500-60000)
+                        To stop type Control-C
+  -i, --interval=#      Monitoring interval in milliseconds. (500-60000)
+  -f, --format=name     Output format(tsv, csv), default is csv. 
 ";
 
 // Print help
@@ -35,6 +37,7 @@ try {
     $password = '';
     $untilStopped = false;
     $interval = 1000;
+    $format = 'csv';
 
     // Parse arguments
     $len = count($argv);
@@ -71,9 +74,13 @@ try {
             case '-i':
                 $target = 'interval';
                 continue 2;
+
+            case '-f':
+                $target = 'format';
+                continue 2;
         }
 
-        $pattern = '/^--(host|port|user|password|interval)=(.+)$/';
+        $pattern = '/^--(host|port|user|password|interval|format)=(.+)$/';
 
         if (preg_match($pattern, $argv[$i], $matches)) {
             switch ($matches[1]) {
@@ -82,6 +89,7 @@ try {
                 case 'user':
                 case 'password':
                 case 'interval':
+                case 'format':
                     ${$matches[1]} = $matches[2];
                     continue 2;
             }
@@ -92,7 +100,7 @@ try {
 
     // Validate interval
     if ($untilStopped) {
-        if(!is_numeric($interval)) {
+        if (!is_numeric($interval)) {
             throw new Exception("Invalid interval");
         } elseif ($interval < 500) {
             throw new Exception("Too short interval");
@@ -101,7 +109,7 @@ try {
         }
     }
 
-    $interval = $untilStopped? intval($interval, 10): 0;
+    $interval = $untilStopped ? intval($interval, 10) : 0;
 
     // Connect MySQL by PDO
     $dsn = "mysql:host=" . $host . ";port=" . $port . ";charset=utf8;";
@@ -111,9 +119,23 @@ try {
     do {
         $res = $db->query("SHOW FULL PROCESSLIST", PDO::FETCH_ASSOC);
 
-        while ($v = $res->fetch()) {
-            echo "[" . date('Y-m-d H:i:s') . "] " . implode("\t", $v), "\n";
+        switch ($format) {
+            case 'tsv':
+                $sep = "\t";
+                break;
+
+            case 'csv':
+                $sep = ",";
+                break;
+
+            default:
+                throw new Exception('Wrong output format');
         }
+
+        while ($v = $res->fetch()) {
+            echo "[" . date('Y-m-d H:i:s') . "] " . implode($sep, $v), "\n";
+        }
+
 
         usleep($interval * 1000);
     } while ($untilStopped);
