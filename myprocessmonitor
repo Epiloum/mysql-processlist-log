@@ -1,7 +1,8 @@
 #!/usr/bin/env php
 <?php
 // Help Text
-$help = "MySQL Query List Monitor
+$help = "MySQL Process List Monitor
+https://github.com/Epiloum/mysql-processlist-log
 
 Usage:
   command [options]
