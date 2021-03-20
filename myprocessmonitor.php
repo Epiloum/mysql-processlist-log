@@ -33,7 +33,7 @@ try {
     $target = null;
     $host = 'localhost';
     $port = 3306;
-    $user = '';
+    $user = 'root';
     $password = '';
     $untilStopped = false;
     $interval = 1000;
