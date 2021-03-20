@@ -9,7 +9,8 @@ It is available on any OS installed PHP. You can execute it by php:
 If you execute it without any options, you will get the following usage guidelines.
 
     [root@host ~]# php myprocessmonitor.php
-    MySQL Query List Monitor
+    MySQL Process List Monitor
+    https://github.com/Epiloum/mysql-processlist-log
 
     Usage:
         command [options]
