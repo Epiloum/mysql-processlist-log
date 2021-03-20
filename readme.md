@@ -48,7 +48,7 @@ If you execute it with the until-stopped option(-t or --until-stopped), it will 
 
 If you want to set the interval of displaying, you can use an interval option(-i or --interval=#) by milliseconds between 500 and 60000. It only works with the until-stopped option.
 
-    [root@host ~]# php myprocessmonitor -t -i3000 -u root -p Password
+    [root@host ~]# php myprocessmonitor -t -i 3000 -u root -p Password
     2021-03-20 10:27:43     root    172.22.0.1:42708                Query   0       starting                SHOW FULL PROCESSLIST
     2021-03-20 10:27:43     root    172.22.0.1:42711    service     Sleep   4
     2021-03-20 10:27:43     usrweb  172.22.0.1:42714    service     Query   1       Copying to tmp table    SELECT * FROM users WHERE created_at >= '2021-03-20'
